@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Crypto Price Tracker</title>
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
 <body class="bg-gray-100">
@@ -13,6 +13,5 @@
 </div>
 
 @livewireScripts
-<script src="{{ asset('js/app.js') }}"></script>
 </body>
 </html>
