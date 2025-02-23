@@ -5,5 +5,5 @@
     <div class="mb-4">
         @livewire('live-clock')
     </div>
-    @livewire('crypto-price-table')
+    @livewire('crypto-price')
 @endsection

@@ -31,4 +31,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'crypto' => [
+        'base_url' => env('CRYPTO_BASE_URL'),
+        'pairs' => env('CRYPTO_PAIRS'),
+        'exchanges' => env('CRYPTO_EXCHANGES'),
+        'price_interval' => env('CRYPTO_PRICE_INTERVAL'),
+        'api_key' => env('CRYPTO_API_KEY'),
+    ],
+
 ];
