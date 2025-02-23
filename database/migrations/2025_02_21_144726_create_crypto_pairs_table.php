@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('pair');
             $table->decimal('average_price', 18, 8);
-            $table->decimal('price_change', 18, 8);
+            $table->decimal('price_change', 18, 8)->default(0);
             $table->timestamp('last_updated');
             $table->timestamps();
         });
