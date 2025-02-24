@@ -29,13 +29,15 @@ class FetchCryptoPrices implements ShouldQueue
             $averagePrice = $this->fetchPricesForPair($pair, $exchanges, $cryptoClient);
             $averagePrice = $averagePrice ?: 0;
 
+            $existingCryptoPair = CryptoPair::where('pair', $pair)->first();
+
             return tap(CryptoPair::updateOrCreate(
                 ['pair' => $pair],
                 ['average_price' => $averagePrice, 'last_updated' => now()]
-            ), function ($cryptoPair) use ($averagePrice) {
-                if (!$cryptoPair->wasRecentlyCreated) {
+            ), function ($cryptoPair) use ($averagePrice, $existingCryptoPair) {
+                if ($existingCryptoPair) {
                     $cryptoPair->update([
-                        'price_change' => $averagePrice - $cryptoPair->getOriginal('average_price')
+                        'price_change' => $averagePrice - $existingCryptoPair->average_price
                     ]);
                 }
             });
