@@ -51,8 +51,13 @@ jobs:
       - name: Clear Config
         run: docker exec -u root app php artisan config:clear
 
-#      - name: Check Database Connection
-#        run: docker exec -u root app php artisan db:show --database=crypto_price_checker
+      - name: Wait for MySQL
+        run: |
+          until docker exec -u root app mysqladmin ping -h "db" --silent; do
+            echo "Waiting for database..."
+            sleep 5
+          done
+
 
       - name: Run Migrations
         run: docker exec -u root app php artisan migrate --force
