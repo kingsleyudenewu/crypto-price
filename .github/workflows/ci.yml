@@ -52,7 +52,7 @@ jobs:
         run: docker exec -u root app php artisan config:clear
 
       - name: Check Database Connection
-        run: docker exec -u crypto_user app php artisan db:show --database=crypto_price_checker
+        run: docker exec -u root app php artisan db:show --database=crypto_price_checker
 
       - name: Run Migrations
         run: docker exec -u root app php artisan migrate --force
@@ -62,10 +62,6 @@ jobs:
 
       - name: Run PestPHP Tests
         run: docker exec -u root app vendor/bin/pest --parallel
-
-      - name: Display Laravel Logs
-        if: failure()
-        run: docker exec -u root app cat storage/logs/laravel.log
 
       - name: Stop Docker services
         if: always()
