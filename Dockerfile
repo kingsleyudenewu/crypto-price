@@ -24,6 +24,10 @@ WORKDIR /var/www
 # Copy existing application directory contents
 COPY . /var/www
 
+# Set permissions
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www
+
 # Install dependencies
 RUN composer install
 
