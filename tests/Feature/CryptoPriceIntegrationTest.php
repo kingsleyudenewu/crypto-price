@@ -43,7 +43,7 @@ test('fetch crypto prices job broadcasts event', function () {
 
 test('fetch crypto prices job updates database', function () {
     // Create initial crypto pairs
-    CryptoPair::factory()->create(['pair' => 'BTCUSDT', 'average_price' => 49000]);
+    $cryptoPair = CryptoPair::factory()->create(['pair' => 'BTCUSDT', 'average_price' => 49000]);
 
     // Mock the CryptoApiService
     $this->instance(CryptoClient::class, $this->mock(CryptoClient::class, function ($mock) {
@@ -56,10 +56,13 @@ test('fetch crypto prices job updates database', function () {
     // Run the job
     FetchCryptoPrices::dispatchSync();
 
+    $priceChange = 96539.92 - $cryptoPair->average_price;
+
     // Assert the database was updated
     $this->assertDatabaseHas('crypto_pairs', [
         'pair' => 'BTCUSDT',
         'average_price' => 96539.92,
+        'price_change' => $priceChange,
     ]);
 });
 
