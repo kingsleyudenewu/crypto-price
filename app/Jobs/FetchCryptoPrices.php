@@ -23,7 +23,7 @@ class FetchCryptoPrices implements ShouldQueue
     {
         $pairs = explode(',',config('services.crypto.pairs'));
         $exchanges = explode(',',config('services.crypto.exchanges'));
-        $cryptoClient = (new CryptoClient());
+        $cryptoClient = app(CryptoClient::class);
 
         $updates = collect($pairs)->map(function ($pair) use ($exchanges, $cryptoClient) {
             $averagePrice = $this->fetchPricesForPair($pair, $exchanges, $cryptoClient);
