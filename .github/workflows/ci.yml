@@ -41,4 +41,4 @@ jobs:
           DB_DATABASE: ${{ secrets.DATABASE }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        run: vendor/bin/phpunit
+        run: vendor/bin/pest
