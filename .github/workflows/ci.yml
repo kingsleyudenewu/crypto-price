@@ -36,27 +36,33 @@ jobs:
       - name: Wait for Docker services
         run: sleep 10s
 
+      - name: Set Git Safe Directory
+        run: docker exec -u root app git config --global --add safe.directory /var/www
+
       - name: Copy .env
         run: docker exec -u root app cp .env.example .env
 
-
       - name: Install Dependencies
-        run: docker exec app composer install --prefer-dist --no-progress --no-interaction
+        run: docker exec -u root app composer install --prefer-dist --no-progress --no-interaction
 
       - name: Generate Key
-        run: docker exec app php artisan key:generate
+        run: docker exec -u root app php artisan key:generate
 
       - name: Clear Config
-        run: docker exec app php artisan config:clear
+        run: docker exec -u root app php artisan config:clear
 
       - name: Run Migrations
-        run: docker exec app php artisan migrate --force
+        run: docker exec -u root app php artisan migrate --force
 
       - name: Set Directory Permissions
-        run: docker exec app chmod -R 777 storage bootstrap/cache
+        run: docker exec -u root app chmod -R 777 storage bootstrap/cache
 
       - name: Run PestPHP Tests
-        run: docker exec app vendor/bin/pest --parallel
+        run: docker exec -u root app vendor/bin/pest --parallel
+
+      - name: Display Laravel Logs
+        if: failure()
+        run: docker exec -u root app cat storage/logs/laravel.log
 
       - name: Stop Docker services
         if: always()
