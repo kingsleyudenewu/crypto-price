@@ -49,22 +49,21 @@ class FetchCryptoPrices implements ShouldQueue
 
     private function fetchPricesForPair(string $pair, array $exchanges, CryptoClient $cryptoClient): ?float
     {
-        // Fetch API responses and extract 'last' price correctly
-        $prices = collect($exchanges)->map(function ($exchange) use ($pair, $cryptoClient) {
+        $prices = [];
+
+        foreach ($exchanges as $exchange) {
             $response = $cryptoClient->getPrice($exchange, $pair);
-            // Ensure response contains expected data format
-            return isset($response[0]['last']) ? (float) $response[0]['last'] : null;
-        });
 
-        // Remove null values (failed responses)
-        $validPrices = $prices->filter();
+            if (!empty($response) && isset($response[0]['last'])) {
+                $prices[] = (float) $response[0]['last'];
+            }
+        }
 
-        if ($validPrices->isEmpty()) {
-            Log::warning("No valid prices found for pair: $pair");
+        if (empty($prices)) {
+            Log::warning("No valid prices found for pair: $pair across " . implode(', ', $exchanges));
             return null;
         }
 
-        // Calculate average price
-        return round($validPrices->avg(), 2);
+        return round(array_sum($prices) / count($prices), 2);
     }
 }
