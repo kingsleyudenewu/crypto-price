@@ -39,6 +39,10 @@ jobs:
       - name: Copy .env
         run: docker exec app cp .env.example .env
 
+      - name: Copy .env
+        run: docker exec -u root app cp .env.example .env
+
+
       - name: Install Dependencies
         run: docker exec app composer install --prefer-dist --no-progress --no-interaction
 
@@ -56,10 +60,6 @@ jobs:
 
       - name: Run PestPHP Tests
         run: docker exec app vendor/bin/pest --parallel
-
-      - name: Display Laravel Logs
-        if: failure()
-        run: docker exec app cat storage/logs/laravel.log
 
       - name: Stop Docker services
         if: always()
