@@ -21,6 +21,7 @@ A solution for fetching realtime crypto prices with Laravel, livewire and larave
 - Rename .env.example to .env
 - Create you database and set dbname, username and password on the new .env file
 - Generate your laravel key : ```php artisan key:generate```
+- Generate your migration : ```php artisan migrate```
 - Run ```php artisan schedule:work``` to set up the queue to run at every interval.
 ## License
 
