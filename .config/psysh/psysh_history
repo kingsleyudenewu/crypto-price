@@ -1,0 +1,2 @@
+return env('DB_HOST');
+return env('DB_PASSWORD');
