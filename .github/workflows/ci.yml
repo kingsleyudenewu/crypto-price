@@ -33,14 +33,20 @@ jobs:
       - name: Set Up Docker
         run: docker compose up -d --build
 
+      - name: Wait for Docker services
+        run: sleep 10s
+
       - name: Copy .env
-        run: docker exec app php -r "file_exists('.env') || copy('.env.example', '.env');"
+        run: docker exec app cp .env.example .env
 
       - name: Install Dependencies
-        run: docker exec app composer install --prefer-dist --no-progress
+        run: docker exec app composer install --prefer-dist --no-progress --no-interaction
 
       - name: Generate Key
         run: docker exec app php artisan key:generate
+
+      - name: Clear Config
+        run: docker exec app php artisan config:clear
 
       - name: Run Migrations
         run: docker exec app php artisan migrate --force
@@ -50,3 +56,11 @@ jobs:
 
       - name: Run PestPHP Tests
         run: docker exec app vendor/bin/pest --parallel
+
+      - name: Display Laravel Logs
+        if: failure()
+        run: docker exec app cat storage/logs/laravel.log
+
+      - name: Stop Docker services
+        if: always()
+        run: docker compose down
