@@ -51,8 +51,8 @@ jobs:
       - name: Clear Config
         run: docker exec -u root app php artisan config:clear
 
-      - name: Check Database Connection
-        run: docker exec -u root app php artisan db:show --database=crypto_price_checker
+#      - name: Check Database Connection
+#        run: docker exec -u root app php artisan db:show --database=crypto_price_checker
 
       - name: Run Migrations
         run: docker exec -u root app php artisan migrate --force
