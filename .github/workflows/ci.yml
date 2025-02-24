@@ -37,7 +37,7 @@ jobs:
         run: docker exec app php -r "file_exists('.env') || copy('.env.example', '.env');"
 
       - name: Install Dependencies
-        run: docker exec app composer install --prefer-dist --no-progress --no-suggest
+        run: docker exec app composer install --prefer-dist --no-progress
 
       - name: Generate Key
         run: docker exec app php artisan key:generate
