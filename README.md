@@ -38,7 +38,7 @@ This application employs a multi-component architecture to deliver real-time cry
    # Install all dependencies in one command
    chmod +x setup.sh
    
-   # Run the setup command and allow everything to install properly
+   # Run the setup command and allow docker and every dependecies to be installed properly
     ./setup.sh
    
    # update the database credentials on your .env file
