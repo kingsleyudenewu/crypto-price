@@ -49,6 +49,16 @@ This application employs a multi-component architecture to deliver real-time cry
    DB_USERNAME=xxxx
    DB_PASSWORD=xxxx
    
+   BROADCAST_DRIVER=pusher
+   
+   PUSHER_APP_ID=
+   PUSHER_APP_KEY=
+   PUSHER_APP_SECRET=
+   PUSHER_HOST=
+   PUSHER_PORT=443
+   PUSHER_SCHEME=https
+   PUSHER_APP_CLUSTER=mt1
+   
    Also add your push credentials to the .env file 
    
    # Build your node assets
