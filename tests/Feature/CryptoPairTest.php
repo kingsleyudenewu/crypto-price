@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\CryptoPair;
 use App\Clients\CryptoClient;
+use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
 
@@ -47,11 +48,19 @@ test('fetch the last updated price correctly from crypto pair', function () {
 });
 
 test('fetch api prices concurrently from crypto client', function () {
+    Http::fake([
+        '*' => Http::response([
+            'status' => 'success',
+            'symbols' => [['last' => '96539.92']],
+        ], 200),
+    ]);
+
     $exchanges = ['binance', 'huobi'];
     $pair = 'BTCUSDC';
     $cryptoClient = app(CryptoClient::class);
 
     $pricesByExchange = $cryptoClient->getPrices($exchanges, $pair);
+
     expect($pricesByExchange)->toHaveCount(2);
     expect($pricesByExchange)->toHaveKeys(['binance', 'huobi']);
     expect($pricesByExchange['binance'])->toHaveCount(1);
