@@ -7,7 +7,16 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    gnupg
+
+# Install Node.js and npm properly
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm
+
+# Verify installations
+RUN node -v && npm -v
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -30,15 +39,6 @@ RUN chown -R www-data:www-data /var/www \
 
 # Install dependencies
 RUN composer install
-
-# Install Supervisor
-RUN apt-get update && apt-get install -y supervisor
-
-# Copy Supervisor configuration
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# Change CMD to start Supervisor
-CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
 
 # Copy existing application directory permissions
 COPY --chown=www-data:www-data . /var/www

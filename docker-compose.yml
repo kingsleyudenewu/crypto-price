@@ -15,7 +15,7 @@ services:
             SERVICE_TAGS: dev
         working_dir: /var/www
         depends_on:
-            -  db
+            - db
         volumes:
             - ./:/var/www
             - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
@@ -35,7 +35,7 @@ services:
             - ./:/var/www
             - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
         depends_on:
-            -   app
+            - app
         networks:
             - app-network
 
@@ -57,6 +57,38 @@ services:
         volumes:
             - dbdata:/var/lib/mysql/
             - ./mysql/my.cnf:/etc/mysql/my.cnf
+        networks:
+            - app-network
+
+    #NPM Watcher Service
+    npm-watcher:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: laravel-app
+        container_name: npm-watcher
+        restart: unless-stopped
+        tty: true
+        working_dir: /var/www
+        command: npm run dev
+        volumes:
+            - ./:/var/www
+        networks:
+            - app-network
+
+    #Laravel Scheduler Service
+    scheduler:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: laravel-app
+        container_name: scheduler
+        restart: unless-stopped
+        tty: true
+        working_dir: /var/www
+        command: php artisan schedule:work
+        volumes:
+            - ./:/var/www
         networks:
             - app-network
 

@@ -30,3 +30,13 @@ window.Echo = new Echo({
     forceTLS: (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
     enabledTransports: ['ws', 'wss'],
 });
+
+window.Echo.channel('crypto-prices')
+    .listen('CryptoPriceUpdated', (e) => {
+        // Manually emit to Livewire as a fallback
+        if (typeof Livewire !== 'undefined') {
+            Livewire.emit('CryptoPriceUpdated', e);
+        } else {
+            console.error("Livewire is not defined");
+        }
+    });

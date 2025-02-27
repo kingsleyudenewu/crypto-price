@@ -21,49 +21,50 @@ class FetchCryptoPrices implements ShouldQueue
      */
     public function handle(): void
     {
-        $pairs = explode(',',config('services.crypto.pairs'));
-        $exchanges = explode(',',config('services.crypto.exchanges'));
+        $pairs = explode(',', config('services.crypto.pairs'));
+        $exchanges = explode(',', config('services.crypto.exchanges'));
         $cryptoClient = app(CryptoClient::class);
 
         $updates = collect($pairs)->map(function ($pair) use ($exchanges, $cryptoClient) {
+            // Fetch prices in parallel for the pair
             $averagePrice = $this->fetchPricesForPair($pair, $exchanges, $cryptoClient);
             $averagePrice = $averagePrice ?: 0;
 
-            $existingCryptoPair = CryptoPair::where('pair', $pair)->first();
+            // Fetch last stored price for comparison
+            $lastCryptoEntry = CryptoPair::where('pair', $pair)->latest('created_at')->first();
+            $previousPrice = $lastCryptoEntry?->average_price ?? 0;
 
-            return tap(CryptoPair::updateOrCreate(
-                ['pair' => $pair],
-                ['average_price' => $averagePrice, 'last_updated' => now()]
-            ), function ($cryptoPair) use ($averagePrice, $existingCryptoPair) {
-                if ($existingCryptoPair) {
-                    $cryptoPair->update([
-                        'price_change' => $averagePrice - $existingCryptoPair->average_price
-                    ]);
-                }
-            });
+            // Store a new entry instead of updating an existing one
+            return CryptoPair::create([
+                'pair' => $pair,
+                'average_price' => $averagePrice,
+                'price_change' => $averagePrice - $previousPrice,
+                'last_updated' => now(),
+            ]);
         });
 
         // Broadcast all updates in one go
         $updates->each(fn($cryptoPair) => broadcast(new CryptoPriceUpdated($cryptoPair))->toOthers());
+
     }
 
     private function fetchPricesForPair(string $pair, array $exchanges, CryptoClient $cryptoClient): ?float
     {
-        $prices = [];
+        // Fetch all prices concurrently
+        $pricesByExchange = $cryptoClient->getPrices($exchanges, $pair);
 
-        foreach ($exchanges as $exchange) {
-            $response = $cryptoClient->getPrice($exchange, $pair);
+        // Extract valid prices
+        $prices = collect($pricesByExchange)
+            ->map(fn($data) => $data[0]['last'] ?? null) // Extract "last" price
+            ->filter() // Remove null values
+            ->map(fn($price) => (float)$price)
+            ->values();
 
-            if (!empty($response) && isset($response[0]['last'])) {
-                $prices[] = (float) $response[0]['last'];
-            }
-        }
-
-        if (empty($prices)) {
+        if ($prices->isEmpty()) {
             Log::warning("No valid prices found for pair: $pair across " . implode(', ', $exchanges));
             return null;
         }
 
-        return round(array_sum($prices) / count($prices), 2);
+        return round($prices->average(), 2);
     }
 }

@@ -1,4 +1,5 @@
 <div>
+    <h2>Crypto Prices ({{ count($cryptoPairs) }} pairs)</h2>
     <table class="min-w-full bg-white">
         <thead>
         <tr>
@@ -41,32 +42,10 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        window.Echo.channel('crypto-prices')
-            .listen('CryptoPriceUpdated', (e) => {
-                updatePriceDisplay(e.cryptoPair);
-            });
-    });
-
-    function updatePriceDisplay(cryptoPair) {
-        const row = document.querySelector(`#crypto-pair-${cryptoPair.id}`);
-        if (row) {
-            const priceElement = row.querySelector('.price');
-            const changeElement = row.querySelector('.price-change');
-
-            // Update price
-            priceElement.textContent = `$${cryptoPair.average_price.toFixed(2)}`;
-
-            // Update price change
-            const changeValue = cryptoPair.price_change;
-            const changeClass = changeValue >= 0 ? 'text-green-500' : 'text-red-500';
-            const changeArrow = changeValue >= 0 ? '↑' : '↓';
-            changeElement.textContent = `${changeArrow} $${Math.abs(changeValue).toFixed(2)}`;
-            changeElement.className = `price-change ${changeClass}`;
-
-            // Add a temporary highlight effect
-            row.classList.add('bg-yellow-100');
-            setTimeout(() => row.classList.remove('bg-yellow-100'), 1000);
-        }
-    }
+    // document.addEventListener('DOMContentLoaded', function () {
+    //     window.Echo.channel('crypto-prices')
+    //         .listen('.CryptoPriceUpdated', (event) => {
+    //             Livewire.emit('refreshCryptoPairs');
+    //         });
+    // });
 </script>

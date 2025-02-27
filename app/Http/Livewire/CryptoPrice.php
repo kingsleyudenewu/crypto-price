@@ -7,26 +7,30 @@ use Livewire\Component;
 
 class CryptoPrice extends Component
 {
-    public $cryptoPairs;
+    public $cryptoPairs = [];
 
-    protected $listeners = ['echo:crypto-prices, CryptoPriceUpdated' => 'updatePrices'];
+    protected $listeners = [
+        'echo:crypto-prices,CryptoPriceUpdated' => 'refreshCryptoPairs',
+        'CryptoPriceUpdated' => 'refreshCryptoPairs'
+    ];
 
     public function mount()
     {
-        $this->cryptoPairs = CryptoPair::all();
+        $this->fetchCryptoPairs();
     }
 
-    public function updatePrices($event)
+    public function refreshCryptoPairs($event = null)
     {
-        $updatedPair = $event['cryptoPair'];
+        logger('Crypto price update received', ['event' => $event]);
+        $this->fetchCryptoPairs();
+    }
 
-        foreach ($this->cryptoPairs as $index => $price) {
-            if ($price->pair === $updatedPair['pair']) {
-                $this->prices[$index]['average_price'] = $updatedPair['average_price'];
-                $this->prices[$index]['last_updated'] = $updatedPair['last_updated'];
-                break;
-            }
-        }
+    private function fetchCryptoPairs()
+    {
+        $this->cryptoPairs = CryptoPair::orderBy('last_updated', 'desc')->get();
+
+        // Log fetched data for debugging
+        logger('Fetched crypto pairs', ['count' => count($this->cryptoPairs)]);
     }
 
     public function render()
