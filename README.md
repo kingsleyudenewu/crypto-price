@@ -35,6 +35,9 @@ This application employs a multi-component architecture to deliver real-time cry
    git clone https://github.com/yourusername/crypto-price-checker.git
    cd crypto-price-checker
    
+   # Install composer dependencies and NPM packages
+    composer install && npm install
+   
    # Install all dependencies in one command
    chmod +x setup.sh
    
